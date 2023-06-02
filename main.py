@@ -3,13 +3,22 @@ import store
 
 product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
-                products.Product("Google Pixel 7", price=500, quantity=250)
+                products.Product("Google Pixel 7", price=500, quantity=250),
+                products.NonStockedProduct("Windows License", price=125),
+                products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                 ]
 best_buy = store.Store(product_list)
 
 
+def empty_str_checker(data):
+    # If string is empty return False.
+    if data == '':
+        return False
+    return True
+
+
 def start(store_object):
-    # while loop until 'Quit' is promted
+    # while loop until 'Quit' is prompted
     while True:
         option = int(input('''~~~~~~~
     Store Catalogue
@@ -25,39 +34,56 @@ Please choose a number: '''))
             # returns the list of products in the store.
             num = 1
             print("~~~~~~~")
-            for item in best_buy.product_list:
-                print(item.show())
-                num += 1
+            for item in store_object.product_list:
+                if item.is_active():
+                    print(f"{num}. {item.show()}")
+                    num += 1
 
         elif option == 2:
             # returns the quantity of all items in store
-            print(f"~~~~~~~\n{best_buy.get_total_quantity()} Items total in store!")
+            print(f"~~~~~~~\n{store_object.get_total_quantity()} items total in store!")
 
         elif option == 3:
             # places an order of item name and qnt.
             num = 1
             print("~~~~~~~")
-            for item in best_buy.product_list:
-                print(f"{num}. {item.show()}")
-                num += 1
+
+            # Displays a list of active products and assigns a num to help retrieve later.
+            product_list_key = []
+            for item in store_object.product_list:
+                if item.is_active():
+                    print(f"{num}. {item.show()}")
+                    num_to_item = num, item
+                    product_list_key.append(num_to_item)
+                    num += 1
 
             total = 0
             while True:
                 # Will break once no values is entered in bot inputs.
-                item_num = input("\nWhat product you want (please enter the number associated): ")
+                item_num = input("\nWhat # product do you want? (leave fields empty if you'd like to checkout): ")
                 quantity = input("How many: ")
-                if item_num == '' and quantity == '':
+
+                if empty_str_checker(item_num) is False and empty_str_checker(quantity) is False:
                     print("Nothing was entered, so we will exit the order process.")
                     break
+                if empty_str_checker(item_num) is False or empty_str_checker(quantity) is False:
+                    print("Please ensure both fields are either empty of filled.")
+                    continue
+
                 try:
-                    sub_total, message = best_buy.order([(item_num, quantity)])
+                    item = None
+                    for key in product_list_key:
+                        if int(item_num) == key[0]:
+                            item = key[1]
+                    if item is None:
+                        raise UnboundLocalError
+                    sub_total, message = store_object.order((item, int(quantity)))
                     print(message)
                     total += sub_total
 
-                except ValueError:
-                    print("Please ensure the fields are filled out as guided.")
-                except IndexError:
-                    print("Please only enter a number associated with a product.")
+                except UnboundLocalError:
+                    print("Invalid # was entered for product.")
+
             print(f"Your total is £{total}")
 
         elif option == 4:
