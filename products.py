@@ -10,11 +10,13 @@ class Product:
 
     def get_quantity(self):
         # Returns quantity of selected product.
-        return float(quantity)
+        return float(self.quantity)
 
     def set_quantity(self, quantity):
         # Re-assigns a new value for products quantity
         self.quantity = quantity
+        if self.quantity <= 0:
+            self.deactivate()
 
     def is_active(self):
         # Returns products active status
@@ -35,5 +37,8 @@ class Product:
     def buy(self, quantity):
         # Returns price of product
         total_price = 0
+        if quantity > self.quantity:
+            return 0.0
         total_price += (self.price * quantity)
+        self.set_quantity(self.quantity - quantity)
         return total_price
