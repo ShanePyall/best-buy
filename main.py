@@ -43,7 +43,7 @@ Please choose a number: '''))
 
             total = 0
             while True:
-                # Will break
+                # Will break once no values is entered in bot inputs.
                 item_num = input("\nWhat product you want (please enter the number associated): ")
                 quantity = input("How many: ")
                 if item_num == '' and quantity == '':

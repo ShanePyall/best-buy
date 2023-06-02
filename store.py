@@ -1,9 +1,10 @@
 import products
 
-
 class Store:
+    # Creates new object as Store, receives a list of products to contain.
 
     def __init__(self, product_list):
+        # Store must have at-least a list when defined.
         self.product_list = product_list
 
     def add_product(self, product):
