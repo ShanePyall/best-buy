@@ -7,6 +7,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def get_quantity(self):
         # Returns quantity of selected product.
@@ -32,15 +33,28 @@ class Product:
 
     def show(self):
         # Returns string of products values.
+        if self.promotion is not None:
+            return f'''{self.name}, Price: {self.price}, \
+Quantity: {self.quantity}, \
+Promotion: {self.promotion.discount_text}'''
         return f'{self.name}, Price: {self.price}, Quantity: {self.quantity}'
 
     def buy(self, quantity):
         # Returns price of product
         if quantity > self.quantity:
             return 0.0
-        total_price = self.price * quantity
+        if self.promotion is not None:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
         self.set_quantity(self.quantity - quantity)
         return total_price
+
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
 
 
 class NonStockedProduct(Product):
@@ -50,9 +64,14 @@ class NonStockedProduct(Product):
         self.quantity = 0
 
     def show(self):
+        if self.promotion is not None:
+            return f'''{self.name}, Price: {self.price}, \
+Promotion: {self.promotion.discount_text}'''
         return f'{self.name}, Price: {self.price}'
 
     def buy(self, quantity):
+        if self.promotion is not None:
+            return self.promotion.apply_promotion(self, quantity)
         return self.price * quantity
 
 
@@ -63,6 +82,11 @@ class LimitedProduct(Product):
         self.maximum = int(maximum)
 
     def show(self):
+        if self.promotion is not None:
+            return f'''{self.name}, Price: {self.price}, \
+Quantity: {self.quantity}, \
+maximum: {self.maximum}, \
+Promotion: {self.promotion.discount_text}'''
         return f'{self.name}, Price: {self.price}, Quantity: {self.quantity}, maximum: {self.maximum}'
 
     def buy(self, quantity):

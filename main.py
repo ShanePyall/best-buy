@@ -1,5 +1,6 @@
 import products
 import store
+import promotions
 
 product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                 products.Product("Bose QuietComfort Earbuds", price=250, quantity=500),
@@ -7,6 +8,17 @@ product_list = [products.Product("MacBook Air M2", price=1450, quantity=100),
                 products.NonStockedProduct("Windows License", price=125),
                 products.LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
                 ]
+
+# Create promotion catalog
+second_half_price = promotions.SecondHalfPrice("Second Half price!")
+third_one_free = promotions.ThirdOneFree("Third One Free!")
+thirty_percent = promotions.PercentDiscount("30% off!", percent=30)
+
+# Add promotions to products
+product_list[0].set_promotion(second_half_price)
+product_list[1].set_promotion(third_one_free)
+product_list[3].set_promotion(thirty_percent)
+
 best_buy = store.Store(product_list)
 
 
@@ -15,6 +27,16 @@ def empty_str_checker(data):
     if data == '':
         return False
     return True
+
+
+def input_validator(data):
+    try:
+        int(data)
+        if int(data) > 0:
+            return True
+        return "Please enter number larger than 0"
+    except ValueError:
+        return "Please only enter numbers"
 
 
 def start(store_object):
@@ -68,6 +90,13 @@ Please choose a number: '''))
                     break
                 if empty_str_checker(item_num) is False or empty_str_checker(quantity) is False:
                     print("Please ensure both fields are either empty of filled.")
+                    continue
+
+                if input_validator(item_num) == str:
+                    print(input_validator(item_num))
+                    continue
+                if input_validator(quantity) == str:
+                    print(input_validator(quantity))
                     continue
 
                 try:
